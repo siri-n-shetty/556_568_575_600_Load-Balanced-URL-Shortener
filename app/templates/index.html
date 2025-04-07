@@ -1,0 +1,20 @@
+<!-- app/templates/index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>URL Shortener</title>
+</head>
+<body style="font-family: sans-serif; text-align: center; padding: 50px;">
+  <h2>🔗 URL Shortener</h2>
+  <form method="POST" action="/shorten">
+    <input type="text" name="url" placeholder="Enter URL" style="width: 300px; padding: 10px;" required />
+    <button type="submit" style="padding: 10px;">Shorten</button>
+  </form>
+
+  {% if short_url %}
+    <p>✅ Short URL: <a href="{{ short_url }}">{{ short_url }}</a></p>
+  {% elif error %}
+    <p style="color: red;">⚠️ {{ error }}</p>
+  {% endif %}
+</body>
+</html>

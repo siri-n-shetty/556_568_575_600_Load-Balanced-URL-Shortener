@@ -1,8 +1,8 @@
-from flask import Flask, request, redirect, jsonify
+from flask import Flask, request, redirect, jsonify, render_template
 import string, random, os
 import redis
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates')
 
 # Connect to Redis
 redis_host = os.getenv('REDIS_HOST', 'localhost')
@@ -13,16 +13,20 @@ def generate_short_url(length=6):
     chars = string.ascii_letters + string.digits
     return ''.join(random.choice(chars) for _ in range(length))
 
+@app.route('/')
+def index():
+    return render_template('index.html')
+
 @app.route('/shorten', methods=['POST'])
 def shorten_url():
-    data = request.get_json()
-    long_url = data.get('url')
+    long_url = request.form.get('url')
     if not long_url:
-        return jsonify({'error': 'Missing URL'}), 400
+        return render_template('index.html', error='Please provide a URL.')
 
     short_id = generate_short_url()
     r.set(short_id, long_url)
-    return jsonify({'short_url': request.host_url + short_id})
+    short_url = request.host_url + short_id
+    return render_template('index.html', short_url=short_url)
 
 @app.route('/<short_id>')
 def redirect_to_url(short_id):
@@ -30,13 +34,6 @@ def redirect_to_url(short_id):
     if long_url:
         return redirect(long_url)
     return jsonify({'error': 'URL not found'}), 404
-
-@app.route('/')
-def index():
-    return '''
-    <h2>URL Shortener</h2>
-    <p>Use <code>POST /shorten</code> with a JSON body like {"url": "https://example.com"}.</p>
-    '''
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
