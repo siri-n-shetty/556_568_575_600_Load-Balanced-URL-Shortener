@@ -1,5 +1,3 @@
-# Dockerfile
-
 # Use official Python base image
 FROM python:3.10-slim
 
@@ -28,5 +26,4 @@ COPY . .
 EXPOSE 5000
 
 # Command to run the Flask app
-# CMD ["python", "main.py"]
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "main:app"]
+CMD ["python", "main.py"]
